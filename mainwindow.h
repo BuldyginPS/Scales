@@ -5,12 +5,10 @@
 #include <windows.h>
 #include <iostream>
 #include <cstring>
-#include <array>
-#include <vector>
 #include <QVector>
 #include <QTime>
+#include <QTimer>
 #include <cmath>
-
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -24,12 +22,13 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-private slots:
-    void on_startButton_clicked();
-    void on_startButton_2_clicked();
-
 private:
     Ui::MainWindow *ui;
+    QTimer *tmr;
+private slots:
+    void updateTime();
 
+    void on_weghtNowBtn_clicked();
+    void on_startButton_clicked();
 };
 #endif // MAINWINDOW_H

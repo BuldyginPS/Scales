@@ -1,11 +1,5 @@
 #include "mainwindow.h"
-//#include "func.cpp"
 #include "./ui_mainwindow.h"
-
-
-//#include "mainwindow.h"
-
-using namespace std;
 
 HANDLE hSerial;
 
@@ -53,7 +47,6 @@ int hex4(QVector<int> numb1,QVector<int> numb2)
 
     return numb;
 }
-
 
 QVector<int> AsciitoBin(char ch)
 {
@@ -105,7 +98,7 @@ int ReadCOM(HANDLE hSerial)
     {
         ReadFile(hSerial, &sReceivedChar, 1, &iSize, 0);
         if (iSize > 0)
-        {            
+        {
             if (i == 2) numb1 = AsciitoBin(sReceivedChar);
 
             if (i == 3)
@@ -120,11 +113,18 @@ int ReadCOM(HANDLE hSerial)
     return numb;
 }
 
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    tmr = new QTimer(this);
+    tmr->setInterval(500);
+    connect(tmr, SIGNAL(timeout()), this, SLOT(updateTime()));
+    tmr->start();
+
 
 
     LPCTSTR sPortName = L"COM7";
@@ -159,20 +159,40 @@ MainWindow::MainWindow(QWidget *parent)
     DWORD dwSize = sizeof(data);
     DWORD dwBytesWritten;
 
-    BOOL iRet = WriteFile(hSerial, data, dwSize, &dwBytesWritten, NULL);
+    WriteFile(hSerial, data, dwSize, &dwBytesWritten, NULL);
 
-     qDebug() << dwSize << " Bytes in string. " << dwBytesWritten << " Bytes sended. \n" ;
+    qDebug() << dwSize << " Bytes in string. " << dwBytesWritten << " Bytes sended. \n" ;
+
 
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete tmr;
 }
 
+void MainWindow::updateTime()
+{
+    weight_start = ReadCOM(hSerial);
+    ui->label_5->setText(QString::number(weight_start));
+
+}
+
+void MainWindow::on_weghtNowBtn_clicked()
+{
+    /*
+    ui->textEdit->clear();
+    ui->textEdit->setFocus();
+
+    weight_start = ReadCOM(hSerial);
+    ui->textEdit->textCursor().insertText(QString::number(weight_start));*/
+
+}
 
 void MainWindow::on_startButton_clicked()
 {
+    /*
     QTime time = QTime::currentTime();
 
     int msec;
@@ -188,25 +208,6 @@ void MainWindow::on_startButton_clicked()
     msec = time.msecsTo( QTime::currentTime() );
     qDebug() << msec ;//"OVER";
     ui->label_3->setText(QString::number((double)msec/1000)+" sec");
-
-}
-/*
-void MainWindow::taking_data()
-{
-    keybd_event(VK_LCONTROL ,0, 0, 0);
-    keybd_event('J' ,0, 0, 0);
-    keybd_event(VK_LCONTROL, 0, KEYEVENTF_KEYUP, 0);
-    keybd_event('J', 0, KEYEVENTF_KEYUP, 0);
-    qDebug() << "Data taking";
-}
 */
-
-void MainWindow::on_startButton_2_clicked()
-{
-    ui->textEdit->clear();
-    ui->textEdit->setFocus();
-
-    weight_start = ReadCOM(hSerial);
-    ui->textEdit->textCursor().insertText(QString::number(weight_start));
 }
 
